@@ -2,7 +2,7 @@ name: Pylint
 
 on:
   push:
-    brabranches: ["main"]
+    branches: ["main"]
 jobs:
   build:
     runs-on: ubuntu-latest
