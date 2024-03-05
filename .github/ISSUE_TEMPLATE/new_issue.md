@@ -7,6 +7,6 @@ assignees: ''
 
 ---
 
-- [x] Requested change 1
-- [x] Requested change 2
+- [ ] Requested change 1
+- [ ] Requested change 2
 ...
