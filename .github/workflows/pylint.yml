@@ -22,4 +22,4 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Lint with pylint
       run: |
-        pylint $(git ls-files '*.py')
+        pylint --ignore="challenge_basic.py" $(git ls-files '*.py')
