@@ -49,19 +49,19 @@ def get_number(s):
     n_list = get_number_list(s)
     return n_list[0] if len(n_list) >= 1 else -1
 
-def find_area_at_rank(l, i):
+def find_area_at_rank(l, _i):
     """Return the area at a certain rank in list `l`.
 
     Areas are indexed starting at 1 as ordered in the survey.
 
     If area is not present in `l`, return -1.
     """
-    return l.index(i) + 1 if i in l else -1
+    return l.index(_i) + 1 if _i in l else -1
 
-def cat_in_s(s, cat):
+def cat_in_s(s, category):
     """Return if a category is present in string `s` as an binary integer.
     """
-    return int(cat in s) if not pd.isna(s) else 0
+    return int(category in s) if not pd.isna(s) else 0
 
 if __name__ == "__main__":
 
