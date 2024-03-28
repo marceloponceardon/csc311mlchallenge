@@ -3,7 +3,7 @@
 - Mars **poncema2**
 - Nick **utorid**
 - Vish **utorid**
-- Christian **utorid**
+- Christian **cauneich**
 # Description
 The machine learning challenge for CSC 311 at the University of Toronto.
 Your task is to use the provided data to build a **classifier** related to this data set, likely to predict which city a student is referring to in their response.
