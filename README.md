@@ -2,7 +2,7 @@
 ## Team Members
 - Mars **poncema2**
 - Nick **utorid**
-- Vish **utorid**
+- Vish **dillibab**
 - Christian **cauneich**
 # Description
 The machine learning challenge for CSC 311 at the University of Toronto.
