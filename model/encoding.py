@@ -121,8 +121,8 @@ def split_data(x, y, train=0.7, test=0.15):
     """
 
     n = len(x)
-    n_train = int(n * train_percent)
-    n_test = int(n * test_percent)
+    n_train = int(n * train)
+    n_test = int(n * test)
 
     x_train, y_train = x[:n_train], y[:n_train]
     x_test, y_test = x[n_train:n_train+n_test], y[n_train:n_train+n_test]
@@ -148,9 +148,6 @@ def main():
         print("validation set:", x_valid.shape, y_valid.shape)
 
     # Train the model
-
-
-
 
 if __name__ == "__main__":
     main()
