@@ -134,6 +134,7 @@ def main():
     """
     The main function executes the encoding and training of the model, and prints the results
     """
+    # Example usage
     x, y = encode(file_name)
     print("Data encoded")
     print("x shape:", x.shape)
@@ -141,13 +142,55 @@ def main():
 
     # Split 0.6 0.2
     x_train, y_train, x_test, y_test, x_valid, y_valid = split_data(x, y, 0.6, 0.2)
-    print("Data split")
-    print("training set:", x_train.shape, y_train.shape)
-    print("testing set:", x_test.shape, y_test.shape)
-    if x_valid.size > 0:
-        print("validation set:", x_valid.shape, y_valid.shape)
+    print("Data split:")
+    # Print in a nice format
+    print(f"Training data: {x_train.shape[0]} samples")
+    print(f"Testing data: {x_test.shape[0]} samples")
+    print(f"Validation data: {x_valid.shape[0]} samples")
 
     # Train the model
+    print("Model training goes here...")
+    FILE_NAME = "clean_dataset.csv"
+    FILE_PATH = "" # "../../model/"
+
+    # Encode the data
+    X, t = encode(FILE_PATH + FILE_NAME)
+    print("Number of data points: " + str(x.shape[0]))
+
+    # Split the data
+    print("Split: 0.6 0.2 0.2")
+    X_train, t_train, X_test, t_test, X_valid, t_valid = split_data(X, t, 0.6, 0.2)
+
+    # Print in a nice format
+    print(f"Training data: {X_train.shape[0]} samples")
+    print(f"Testing data: {X_test.shape[0]} samples")
+    print(f"Validation data: {X_valid.shape[0]} samples")
+
+    from sklearn.linear_model import LinearRegression as LR
+    from sklearn.metrics import mean_squared_error as mse
+
+    # Fit, train and test
+    linreg = LR(fit_intercept = False, copy_X = True, n_jobs = 50)
+    linreg.fit(X_train, t_train)
+
+    y_train_pred = linreg.predict(X_train)
+    y_test_pred = linreg.predict(X_test)
+    y_valid_pred = linreg.predict(X_valid)
+
+    # Calculate mse for training and testing predicions
+    train_mse = mse(t_train, y_train_pred)
+    test_mse = mse(t_test, y_test_pred)
+    valid_mse = mse(t_valid, y_valid_pred)
+
+    print(linreg.coef_) # weights
+    print("Training MSE:", train_mse)
+    print("Testing MSE:", test_mse)
+    print("Validation MSE:", valid_mse)
+
+    # Print accuracies
+    print("Training accuracy:", linreg.score(X_train, t_train))
+    print("Testing accuracy:", linreg.score(X_test, t_test))
+    print("Validation accuracy:", linreg.score(X_valid, t_valid))
 
 if __name__ == "__main__":
     main()
