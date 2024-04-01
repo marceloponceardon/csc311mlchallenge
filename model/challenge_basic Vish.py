@@ -109,7 +109,7 @@ if __name__ == "__main__":
     data = data.sample(frac=1, random_state=42)
 
     x = data.drop("Label", axis=1).values
-    y = pd.get_dummies(data["Label"].values)
+    y = pd.get_dummies(data["Label"]).values
 
     n_train = 1200
 
