@@ -12,6 +12,10 @@ import pandas as pd
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 
+import sys
+import numpy
+numpy.set_printoptions(threshold=sys.maxsize)
+
 file_name = "clean_dataset.csv"
 random_state = 42
 
@@ -123,11 +127,28 @@ if __name__ == "__main__":
     # Train and evaluate classifiers
 
     #clf = KNeighborsClassifier(n_neighbors=3)
-    clf = MLPClassifier(max_iter=200, hidden_layer_sizes=(4000, 4000), activation="logistic", verbose=True, alpha=0.001 )
+    lyr = (300, 300, 300, 300)
+    act = "logistic"
+    alpha = 0.1
+    clf = MLPClassifier(max_iter=10000, hidden_layer_sizes=lyr, activation=act, verbose=True, alpha=alpha )
     #alpha=0.0001
     clf.fit(x_train, y_train)
     train_acc = clf.score(x_train, y_train)
     test_acc = clf.score(x_test, y_test)
+    
+    
+    coef = clf.coefs_
+    for i, layer in enumerate(coef):
+        with open(f"./FinalPred/Weights/Layer{i}weights.txt", "w+") as f:
+            for j, node_weights in enumerate(layer):
+                f.write(f"Node {j}: \n")
+                f.write(str(node_weights) +"\n")
+
+
+    print("Layers: ", lyr)
+    print("activation: ", act)
+    print("alpha: ", alpha)
     print(f"{type(clf).__name__} train acc: {train_acc}")
     print(f"{type(clf).__name__} test acc: {test_acc}")
+
 
