@@ -1,7 +1,7 @@
 # CSC 311 ML Challenge
 ## Team Members
 - Mars **poncema2**
-- Nick **utorid**
+- Nick **baldas37**
 - Vish **dillibab**
 - Christian **cauneich**
 # Description
