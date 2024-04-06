@@ -63,7 +63,7 @@ def cat_in_s(s, cat):
     """
     return int(cat in s) if not pd.isna(s) else 0
 
-if __name__ == "__main__":
+def get_data():
 
     data = pd.read_csv(file_name)
 
@@ -108,7 +108,7 @@ if __name__ == "__main__":
     data = data[new_names + ["Q7", "Label"]]
     data = data.sample(frac=1, random_state=42)
 
-    print(list(data.columns))
+    #print(list(data.columns))
     x = data.drop("Label", axis=1).values
     y = pd.get_dummies(data["Label"]).values
 
@@ -120,12 +120,7 @@ if __name__ == "__main__":
     x_test = x[n_train:]
     y_test = y[n_train:]
 
-    # Train and evaluate classifiers
+    return x_train, y_train, x_test, y_test
 
-    clf = KNeighborsClassifier(n_neighbors=3)
-    clf.fit(x_train, y_train)
-    train_acc = clf.score(x_train, y_train)
-    test_acc = clf.score(x_test, y_test)
-    print(f"{type(clf).__name__} train acc: {train_acc}")
-    print(f"{type(clf).__name__} test acc: {test_acc}")
+#x_train, y_train, x_test, y_test = get_data()
 

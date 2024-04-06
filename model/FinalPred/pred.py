@@ -1,28 +1,9 @@
 import os
 import numpy as np
+from dataParsing import get_data
 
 
 
-def softmax(z):
-    """
-    Compute the softmax of vector z, or row-wise for a matrix z.
-    For numerical stability, subtract the maximum logit value from each
-    row prior to exponentiation (see above).
-
-    Parameters:
-        `z` - a numpy array of shape (K,) or (N, K)
-
-    Returns: a numpy array with the same shape as `z`, with the softmax
-        activation applied to each row of `z`
-    """
-
-    if z.shape[1] == 1:
-        ez = np.exp(z - np.max(z))
-        return ez / ez.sum()
-    else:
-        ez = np.exp(z-np.max(z))
-        sum = np.sum(ez, axis=1).reshape((z.shape[0], 1))
-        return np.divide(ez, sum)
 
 
 
@@ -75,8 +56,26 @@ class MLPModel(object):
                                    
 
 
-    def activation(self, X):
-        pass
+    def activation(self, z):
+            """
+            Compute the softmax of vector z, or row-wise for a matrix z.
+            For numerical stability, subtract the maximum logit value from each
+            row prior to exponentiation (see above).
+
+            Parameters:
+                `z` - a numpy array of shape (K,) or (N, K)
+
+            Returns: a numpy array with the same shape as `z`, with the softmax
+                activation applied to each row of `z`
+            """
+
+            if z.shape[1] == 1:
+                ez = np.exp(z - np.max(z))
+                return ez / ez.sum()
+            else:
+                ez = np.exp(z-np.max(z))
+                sum = np.sum(ez, axis=1).reshape((z.shape[0], 1))
+                return np.divide(ez, sum)
 
     def forward(self, X):
         """
@@ -87,6 +86,7 @@ class MLPModel(object):
 
         Returns: A numpy array of predictions of shape (N, self.num_classes)
         """
+        #import pdb; pdb.set_trace()
         L1 = self.activation(self.W1 @ X)
         L2 = self.activation(self.W2 @ L1)
         L3 = self.activation(self.W3 @ L2)
@@ -152,5 +152,41 @@ def do_forward_pass(model, X):
     # return model.y
 
 
-m = MLPModel(num_features = 137, num_hidden = (300, 300, 300, 300), num_classes = 4)
+m = MLPModel(num_features = 138, num_hidden = (300, 300, 300, 300), num_classes = 4)
+x_train, y_train, x_test, y_test = get_data()
 
+label_key = ["Dubai", "Rio de Janeiro", "New York City", "Paris"]
+data_num = 50
+
+print(len(y_train))
+num_correct = 0
+total = len(x_train)
+for i in range(total):
+    data_num = i
+    features = np.array(x_train[data_num], dtype=float).reshape(-1, 1)
+    label = label_key[np.argmax(y_train[data_num])]
+
+    prediction = m.forward(features)
+    predicted_label = label_key[np.argmax(prediction)]
+
+    if label == predicted_label:
+        num_correct += 1
+        print("SUCCESFUL LABEL!!!: ",end="" )
+    else:
+        print("UNSUCCESFUL LABEL: ", end="")
+    print(label, " - ", predicted_label)  
+print(num_correct / total, "%")
+
+
+# features = np.array(x_train[data_num], dtype=float).reshape(-1, 1)
+# label = label_key[np.argmax(y_train[50])]
+
+# prediction = m.forward(features)
+# predicted_label = np.argmax(prediction)
+
+# if label == predicted_label:
+#     num_correct += 1
+#     print("SUCCESFUL LABEL!!!: ",end="" )
+# else:
+#     print("UNSUCCESFUL LABEL: ", end="")
+# print(label, " - ", predicted_label)  
