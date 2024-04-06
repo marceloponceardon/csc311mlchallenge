@@ -6,7 +6,7 @@ from dataParsing import get_data
 
 
 class MLPModel(object):
-    def __init__(self, num_features=138, num_hidden=(300, 300, 300, 300), num_classes=4):
+    def __init__(self, num_features=138, num_hidden=(300, 300, 300, 300), num_classes=4, activation="logistic"):
         """
         Initialize the weights and biases of this two-layer MLP.
         """
@@ -15,12 +15,15 @@ class MLPModel(object):
         self.layer_format = num_hidden
         self.num_classes = num_classes
         self.num_layers = len(num_hidden) + 1
+        self.activation = activation
 
-
+        # Array of all the weight matrices for each layer
         self.layer_matrices = []
 
-        # Featuers to first hidden nodes layer
+        # Add First Layer
         self.layer_matrices.append(np.zeros((self.layer_format[0], self.num_features)))
+
+        # Add deep layers
         for i in range(self.num_layers - 2):
             self.layer_matrices.append(np.zeros((self.layer_format[i+1], self.layer_format[i])))
 
@@ -30,6 +33,7 @@ class MLPModel(object):
 
 
         # Read weights from files and set it into matrices
+        # Dont even try to dechiper what I wrote here
         for i in range(self.num_layers):
             weight_matrix = self.layer_matrices[i]
             with open(f"./Weights/Layer{i}weights.txt", "r") as f:
@@ -38,7 +42,6 @@ class MLPModel(object):
                 for line in f.readlines():
                     if "Node " in line:
                         if col_weights:
-                            #print(col_weights)
                             assert len(col_weights) == weight_matrix.shape[0]
                             weight_matrix[:,weight_col_num] = col_weights
                             col_weights = []
@@ -52,8 +55,7 @@ class MLPModel(object):
                             line = line[:-1].strip()
                         nums = [float(n.strip()) for n in line.split(" ") if n]
                         col_weights.extend(nums)
-            print(weight_matrix)
-            break                   
+                
 
 
     def sig_activation(self, z):
@@ -86,60 +88,57 @@ class MLPModel(object):
 
         Returns: A numpy array of predictions of shape (N, self.num_classes)
         """
-        # Update
-        return 
-        #import pdb; pdb.set_trace()
-        L1 = self.sig_activation(self.W1 @ X)
-        L2 = self.sig_activation(self.W2 @ L1)
-        L3 = self.sig_activation(self.W3 @ L2)
-        L4 = self.sig_activation(self.W4 @ L3)
-        L5 = self.sig_activation(self.W5 @ L4)
 
-        return L5
+        act = None
+        if self.activation == "logistic":
+            act = self.sig_activation
 
+        assert len(self.layer_matrices) >= 2
 
+        # First Layer
+        value = act(self.layer_matrices[0] @ X)
 
+        # Deep Layers
+        for i in range(self.num_layers - 2):
+            value = act(self.layer_matrices[i+1] @ value)
+        
+        # Last Layer
+        value = act(self.layer_matrices[-1] @ value)
 
-
-#m = MLPModel(num_features = 138, num_hidden = (300, 300, 300, 300), num_classes = 4)
-
-m = MLPModel(num_features = 138, num_hidden = (5,), num_classes = 4)
-
-raise Exception
-x_train, y_train, x_test, y_test = get_data()
-
-label_key = ["Dubai", "Rio de Janeiro", "New York City", "Paris"]
-data_num = 50
-
-print(len(y_train))
-num_correct = 0
-total = len(x_train)
-for i in range(total):
-    data_num = i
-    features = np.array(x_train[data_num], dtype=float).reshape(-1, 1)
-    label = label_key[np.argmax(y_train[data_num])]
-
-    prediction = m.forward(features)
-    predicted_label = label_key[np.argmax(prediction)]
-
-    if label == predicted_label:
-        num_correct += 1
-        print("SUCCESFUL LABEL!!!: ",end="" )
-    else:
-        print("UNSUCCESFUL LABEL: ", end="")
-    print(label, " - ", predicted_label)  
-print(num_correct / total, "%")
+        return value
 
 
-features = np.array(x_train[data_num], dtype=float).reshape(-1, 1)
-label = label_key[np.argmax(y_train[50])]
+def do_some_tests(m):
+    # Get train, test data from get_data() in "./dataParsing.py"
+    x_train, y_train, x_test, y_test = get_data()
 
-prediction = m.forward(features)
-predicted_label = np.argmax(prediction)
+    # Labels in Strings
+    label_key = ["Dubai", "Rio de Janeiro", "New York City", "Paris"]
 
-if label == predicted_label:
-    num_correct += 1
-    print("SUCCESFUL LABEL!!!: ",end="" )
-else:
-    print("UNSUCCESFUL LABEL: ", end="")
-print(label, " - ", predicted_label)  
+    
+    num_correct = 0
+    # Change total to the number of test pieces you want to predict
+    total = len(x_train)
+    
+    # Loop over nu
+    for i in range(total):
+        data_num = i
+        features = np.array(x_train[data_num], dtype=float).reshape(-1, 1)
+        label = label_key[np.argmax(y_train[data_num])]
+
+        prediction = m.forward(features)
+        predicted_label = label_key[np.argmax(prediction)]
+
+        if label == predicted_label:
+            num_correct += 1
+            print("SUCCESFUL LABEL!!!: ",end="" )
+        else:
+            print("UNSUCCESFUL LABEL: ", end="")
+        print(label, " - ", predicted_label)  
+    print(num_correct / total, "%")
+
+
+m = MLPModel(num_features = 138, num_hidden = (50, ), num_classes = 4)
+
+do_some_tests(m)
+

@@ -1,5 +1,5 @@
-Layers: (5,)
-Activation: relu
+Layers: (50,)
+Activation: logistic
 Alpha: 0.1
-MLPClassifier train acc: 0.9158333333333334
-MLPClassifier test acc: 0.8432835820895522
+MLPClassifier train acc: 0.9441666666666667
+MLPClassifier test acc: 0.8694029850746269

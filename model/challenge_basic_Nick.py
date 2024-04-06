@@ -123,19 +123,23 @@ if __name__ == "__main__":
     x_test = x[n_train:]
     y_test = y[n_train:]
 
-    # Train and evaluate classifiers
 
-    #clf = KNeighborsClassifier(n_neighbors=3)
-    lyr = (5,)
+
+    # Train and evaluate classifiers
+    # -----------------------------------------------------------------------
+
+    # Hyper parameters
+    lyr = (50,)
     act = "logistic"
     alpha = 0.1
     clf = MLPClassifier(max_iter=10000, hidden_layer_sizes=lyr, activation=act, verbose=True, alpha=alpha )
-    #alpha=0.0001
+   
+    # Train and test
     clf.fit(x_train, y_train)
     train_acc = clf.score(x_train, y_train)
     test_acc = clf.score(x_test, y_test)
     
-    
+    # All weights
     coef = clf.coefs_
     
     # Delete all files in ./FinalPred/Weights
@@ -157,6 +161,7 @@ if __name__ == "__main__":
     print(f"Prediction - Label  | {prediction} - {label}")
     # ----- Testing single inputs
     
+    # Write hyperparameters to "Hyperparameters.txt"
     with open(f"./FinalPred/Weights/Hyperparameters.txt", "w+") as f:
         f.write(f"Layers: {lyr}\n")
         f.write(f"Activation: {act}\n")
@@ -164,7 +169,7 @@ if __name__ == "__main__":
         f.write(f"{type(clf).__name__} train acc: {train_acc}\n")
         f.write(f"{type(clf).__name__} test acc: {test_acc}\n")
 
-
+    # Print output
     print("Layers: ", lyr)
     print("activation: ", act)
     print("alpha: ", alpha)
