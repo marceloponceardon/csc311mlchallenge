@@ -11,10 +11,9 @@ import re
 import pandas as pd
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
-
-import sys
-import numpy
-numpy.set_printoptions(threshold=sys.maxsize)
+import numpy as np
+import os
+import glob
 
 file_name = "clean_dataset.csv"
 random_state = 42
@@ -127,7 +126,7 @@ if __name__ == "__main__":
     # Train and evaluate classifiers
 
     #clf = KNeighborsClassifier(n_neighbors=3)
-    lyr = (300, 300, 300, 300)
+    lyr = (5,)
     act = "logistic"
     alpha = 0.1
     clf = MLPClassifier(max_iter=10000, hidden_layer_sizes=lyr, activation=act, verbose=True, alpha=alpha )
@@ -138,11 +137,32 @@ if __name__ == "__main__":
     
     
     coef = clf.coefs_
+    
+    # Delete all files in ./FinalPred/Weights
+    for f in glob.glob('./FinalPred/Weights/*'):
+        os.remove(f)
     for i, layer in enumerate(coef):
         with open(f"./FinalPred/Weights/Layer{i}weights.txt", "w+") as f:
             for j, node_weights in enumerate(layer):
                 f.write(f"Node {j}: \n")
                 f.write(str(node_weights) +"\n")
+
+
+    # ----- Testing single inputs
+    label_key = ["Dubai", "Rio de Janeiro", "New York City", "Paris"]
+    data_num = 0
+    features = np.array([x_train[data_num]], dtype=float)
+    label = label_key[np.argmax(y_train[data_num])]
+    prediction = label_key[np.argmax(clf.predict(features))]
+    print(f"Prediction - Label  | {prediction} - {label}")
+    # ----- Testing single inputs
+    
+    with open(f"./FinalPred/Weights/Hyperparameters.txt", "w+") as f:
+        f.write(f"Layers: {lyr}\n")
+        f.write(f"Activation: {act}\n")
+        f.write(f"Alpha: {alpha}\n")
+        f.write(f"{type(clf).__name__} train acc: {train_acc}\n")
+        f.write(f"{type(clf).__name__} test acc: {test_acc}\n")
 
 
     print("Layers: ", lyr)
