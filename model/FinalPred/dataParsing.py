@@ -85,9 +85,9 @@ def get_data():
     data['Q8'] = data['Q8'].apply(to_numeric).fillna(0)
     data['Q9'] = data['Q9'].apply(to_numeric).fillna(0)
 
-    normalize_column(data, 'Q7')
-    normalize_column(data, 'Q8')
-    normalize_column(data, 'Q9')
+    # normalize_column(data, 'Q7')
+    # normalize_column(data, 'Q8')
+    # normalize_column(data, 'Q9')
 
     # Convert Q1 to its first number
     data['Q1'] = data['Q1'].apply(get_number)
@@ -102,24 +102,27 @@ def get_data():
         col_name = f"rank_{i}"
         data[col_name] = data["Q6"].apply(lambda l: find_area_at_rank(l, i))
         dummies = create_dummies_with_all_categories(data[col_name], col_name, all_possible_q6_ranks)
+        del data[col_name]
         data = pd.concat([data, dummies], axis=1)
     del data["Q6"]
+
 
     for col in ["Q1", "Q2", "Q3", "Q4"]:
         dummies = create_dummies_with_all_categories(data[col], col, all_possible_q1_q4_categories)
         data = pd.concat([data, dummies], axis=1)
         del data[col]
 
+    new_names = []
     # Create multi-category indicators
     for cat in ["Partner", "Friends", "Siblings", "Co-worker"]:
         cat_name = f"Q5_{cat}"
+        new_names.append(cat_name)
         data[cat_name] = data["Q5"].apply(lambda s: cat_in_s(s, cat))
     del data["Q5"]
 
 
     # Preparing the features and labels
-    needed_columns = [col for col in data.columns if col.startswith(('Q1_', 'Q2_', 'Q3_', 'Q4_', 'Q5' 'Q7', 'Q8', 'Q9', 'rank_'))]
-    data = data[needed_columns + ["Label"]]
+    data = data[new_names + [col for col in data.columns if col.startswith(('Q1_', 'Q2_', 'Q3_', 'Q4_', 'Q7', 'Q8', 'Q9', 'rank_', 'Label'))]]
     data = data.sample(frac=1, random_state=42)
 
     #print(list(data.columns))
@@ -147,9 +150,9 @@ def get_file_data(f_name):
     data['Q8'] = data['Q8'].apply(to_numeric).fillna(0)
     data['Q9'] = data['Q9'].apply(to_numeric).fillna(0)
 
-    normalize_column(data, 'Q7')
-    normalize_column(data, 'Q8')
-    normalize_column(data, 'Q9')
+    # normalize_column(data, 'Q7')
+    # normalize_column(data, 'Q8')
+    # normalize_column(data, 'Q9')
 
     # Convert Q1 to its first number
     data['Q1'] = data['Q1'].apply(get_number)
@@ -165,6 +168,7 @@ def get_file_data(f_name):
         col_name = f"rank_{i}"
         data[col_name] = data["Q6"].apply(lambda l: find_area_at_rank(l, i))
         dummies = create_dummies_with_all_categories(data[col_name], col_name, all_possible_q6_ranks)
+        del data[col_name]
         data = pd.concat([data, dummies], axis=1)
     del data["Q6"]
 
@@ -173,16 +177,17 @@ def get_file_data(f_name):
         data = pd.concat([data, dummies], axis=1)
         del data[col]
 
+    new_names = []
     # Create multi-category indicators
     for cat in ["Partner", "Friends", "Siblings", "Co-worker"]:
         cat_name = f"Q5_{cat}"
+        new_names.append(cat_name)
         data[cat_name] = data["Q5"].apply(lambda s: cat_in_s(s, cat))
     del data["Q5"]
 
 
     # Preparing the features and labels
-    needed_columns = [col for col in data.columns if col.startswith(('Q1_', 'Q2_', 'Q3_', 'Q4_', 'Q5' 'Q7', 'Q8', 'Q9', 'rank_'))]
-    data = data[needed_columns]
+    data = data[new_names + [col for col in data.columns if col.startswith(('Q1_', 'Q2_', 'Q3_', 'Q4_', 'Q7', 'Q8', 'Q9', 'rank_'))]]
     data = data.sample(frac=1, random_state=42)
     
     column_ordering = None
