@@ -1,8 +1,7 @@
 import os
 import numpy as np
 from dataParsing import get_data
-
-
+import csv
 
 
 class MLPModel(object):
@@ -138,7 +137,54 @@ def do_some_tests(m):
     print(num_correct / total, "%")
 
 
-m = MLPModel(num_features = 138, num_hidden = (50, ), num_classes = 4)
+def get_model():
+    lyr = (300, 300, 300)
+    with open("./Weights/Hyperparameters.txt", "r") as f:
+        lyr = eval(f.readline().strip().split(": ")[1])
+    
+    m = MLPModel(num_features = 138, num_hidden = lyr, num_classes = 4)
+    return m
 
-do_some_tests(m)
+
+# GRADED IMPORTANT FUNCTION
+def predict(x):
+    """
+    Helper function to make prediction for a given input x.
+    This code is here for demonstration purposes only.
+    """
+    x = np.array(x, dtype=float).reshape(-1, 1)
+    m = get_model()
+    prediction = m.forward(x)
+    label_key = ["Dubai", "Rio de Janeiro", "New York City", "Paris"]
+    predicted_label = label_key[np.argmax(prediction)]
+
+    # return the prediction
+    return predicted_label
+
+
+# GRADED IMPORTANT FUNCTION
+def predict_all(filename):
+    """
+    Make predictions for the data in filename
+    """
+    m = get_model()
+    label_key = ["Dubai", "Rio de Janeiro", "New York City", "Paris"]
+
+    data = csv.DictReader(open(filename))
+
+    predictions = []
+    for test_example in data:
+        # obtain a prediction for this test example
+        pred = m.forward(x)
+        predicted_label = label_key[np.argmax(pred)]
+        predictions.append(predicted_label)
+
+    return predictions
+
+#x_train, y_train, x_test, y_test = get_data()
+
+#print(predict(x_train[0]))
+
+# m = get_model()
+# do_some_tests(m)
 

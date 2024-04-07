@@ -1,5 +1,5 @@
-Layers: (50,)
+Layers: (100,)
 Activation: logistic
 Alpha: 0.1
-MLPClassifier train acc: 0.9441666666666667
+MLPClassifier train acc: 0.955
 MLPClassifier test acc: 0.8694029850746269

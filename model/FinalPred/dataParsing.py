@@ -9,7 +9,6 @@ where appropriate, but don't stop here!
 
 import re
 import pandas as pd
-from sklearn.neighbors import KNeighborsClassifier
 
 file_name = "clean_dataset.csv"
 random_state = 42

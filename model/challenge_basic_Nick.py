@@ -129,7 +129,7 @@ if __name__ == "__main__":
     # -----------------------------------------------------------------------
 
     # Hyper parameters
-    lyr = (50,)
+    lyr = (100,)
     act = "logistic"
     alpha = 0.1
     clf = MLPClassifier(max_iter=10000, hidden_layer_sizes=lyr, activation=act, verbose=True, alpha=alpha )
