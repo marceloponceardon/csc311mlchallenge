@@ -62,14 +62,32 @@ def cat_in_s(s, cat):
     """
     return int(cat in s) if not pd.isna(s) else 0
 
+def create_dummies_with_all_categories(series, prefix, all_categories):
+    dummies = pd.get_dummies(series, prefix=prefix)
+    expected_columns = [f"{prefix}_{cat}" for cat in all_categories]
+    dummies = dummies.reindex(columns=expected_columns, fill_value=0)
+    return dummies
+
+def normalize_column(data, column_name):
+    """Normalizes the specified column in the DataFrame.
+    """
+    data[column_name] = (data[column_name] - data[column_name].min()) / (data[column_name].max() - data[column_name].min())
+
 def get_data():
 
     data = pd.read_csv(file_name)
+
+    all_possible_q1_q4_categories = [-1, 1, 2, 3, 4, 5]
+    all_possible_q6_ranks = [-1, 1, 2, 3, 4, 5, 6]
 
     # Apply preprocessing to numeric fields
     data['Q7'] = data['Q7'].apply(to_numeric).fillna(0)
     data['Q8'] = data['Q8'].apply(to_numeric).fillna(0)
     data['Q9'] = data['Q9'].apply(to_numeric).fillna(0)
+
+    normalize_column(data, 'Q7')
+    normalize_column(data, 'Q8')
+    normalize_column(data, 'Q9')
 
     # Convert Q1 to its first number
     data['Q1'] = data['Q1'].apply(get_number)
@@ -80,43 +98,28 @@ def get_data():
     # Process Q6 to create area rank categories
     data['Q6'] = data['Q6'].apply(get_number_list_clean)
 
-    temp_names = []
     for i in range(1, 7):
         col_name = f"rank_{i}"
-        temp_names.append(col_name)
         data[col_name] = data["Q6"].apply(lambda l: find_area_at_rank(l, i))
+        dummies = create_dummies_with_all_categories(data[col_name], col_name, all_possible_q6_ranks)
+        data = pd.concat([data, dummies], axis=1)
     del data["Q6"]
 
-    # Create category indicators and dummy variables
-    new_names = []
-
-    col = "Q1"
-    #import pdb; pdb.set_trace()
-    indicators = pd.get_dummies(data[col], prefix=col)
-    for q1_col in ['Q1_-1', 'Q1_1', 'Q1_2', 'Q1_3', 'Q1_4', 'Q1_5']:
-        if q1_col not in indicators.columns:
-            indicators[q1_col] = [False for _ in range(indicators.shape[0])]
-    new_names.extend(indicators.columns)
-    data = pd.concat([data, indicators], axis=1)
-    del data[col]
-
-
-    for col in ["Q2", "Q3", "Q4"] + temp_names:
-        indicators = pd.get_dummies(data[col], prefix=col)
-        new_names.extend(indicators.columns)
-        data = pd.concat([data, indicators], axis=1)
+    for col in ["Q1", "Q2", "Q3", "Q4"]:
+        dummies = create_dummies_with_all_categories(data[col], col, all_possible_q1_q4_categories)
+        data = pd.concat([data, dummies], axis=1)
         del data[col]
 
     # Create multi-category indicators
     for cat in ["Partner", "Friends", "Siblings", "Co-worker"]:
         cat_name = f"Q5_{cat}"
-        new_names.append(cat_name)
         data[cat_name] = data["Q5"].apply(lambda s: cat_in_s(s, cat))
     del data["Q5"]
 
 
     # Preparing the features and labels
-    data = data[new_names + ["Q7", "Q8", "Q9", "Label"]]
+    needed_columns = [col for col in data.columns if col.startswith(('Q1_', 'Q2_', 'Q3_', 'Q4_', 'Q5' 'Q7', 'Q8', 'Q9', 'rank_'))]
+    data = data[needed_columns + ["Label"]]
     data = data.sample(frac=1, random_state=42)
 
     #print(list(data.columns))
@@ -137,10 +140,16 @@ def get_file_data(f_name):
 
     data = pd.read_csv(f_name)
 
+    all_possible_q1_q4_categories = [-1, 1, 2, 3, 4, 5]
+    all_possible_q6_ranks = [-1, 1, 2, 3, 4, 5, 6]
     # Apply preprocessing to numeric fields
     data['Q7'] = data['Q7'].apply(to_numeric).fillna(0)
     data['Q8'] = data['Q8'].apply(to_numeric).fillna(0)
     data['Q9'] = data['Q9'].apply(to_numeric).fillna(0)
+
+    normalize_column(data, 'Q7')
+    normalize_column(data, 'Q8')
+    normalize_column(data, 'Q9')
 
     # Convert Q1 to its first number
     data['Q1'] = data['Q1'].apply(get_number)
@@ -151,56 +160,39 @@ def get_file_data(f_name):
     # Process Q6 to create area rank categories
     data['Q6'] = data['Q6'].apply(get_number_list_clean)
 
-    temp_names = []
+
     for i in range(1, 7):
         col_name = f"rank_{i}"
-        temp_names.append(col_name)
         data[col_name] = data["Q6"].apply(lambda l: find_area_at_rank(l, i))
+        dummies = create_dummies_with_all_categories(data[col_name], col_name, all_possible_q6_ranks)
+        data = pd.concat([data, dummies], axis=1)
     del data["Q6"]
 
-
-
-    # Create category indicators and dummy variables
-    new_names = []
-    
-    col = "Q1"
-    #import pdb; pdb.set_trace()
-    indicators = pd.get_dummies(data[col], prefix=col)
-    for q1_col in ['Q1_-1', 'Q1_1', 'Q1_2', 'Q1_3', 'Q1_4', 'Q1_5']:
-        if q1_col not in indicators.columns:
-            indicators[q1_col] = [False for _ in range(indicators.shape[0])]
-    new_names.extend(indicators.columns)
-    data = pd.concat([data, indicators], axis=1)
-    del data[col]
-
-    for col in ["Q2", "Q3", "Q4" ] + temp_names:
-        #raise Exception(f"data[{col}] = {list(data[col])}")
-        indicators = pd.get_dummies(data[col], prefix=col)
-        new_names.extend(indicators.columns)
-        data = pd.concat([data, indicators], axis=1)
+    for col in ["Q1", "Q2", "Q3", "Q4"]:
+        dummies = create_dummies_with_all_categories(data[col], col, all_possible_q1_q4_categories)
+        data = pd.concat([data, dummies], axis=1)
         del data[col]
-    
 
     # Create multi-category indicators
     for cat in ["Partner", "Friends", "Siblings", "Co-worker"]:
         cat_name = f"Q5_{cat}"
-        new_names.append(cat_name)
         data[cat_name] = data["Q5"].apply(lambda s: cat_in_s(s, cat))
     del data["Q5"]
 
 
     # Preparing the features and labels
-    data = data[new_names + ["Q7", "Q8", "Q9"]]
+    needed_columns = [col for col in data.columns if col.startswith(('Q1_', 'Q2_', 'Q3_', 'Q4_', 'Q5' 'Q7', 'Q8', 'Q9', 'rank_'))]
+    data = data[needed_columns]
     data = data.sample(frac=1, random_state=42)
     
     column_ordering = None
 
 
     x = data.values
-    
-    if len(x[0] != 73):
-        raise Exception(f"Len: {len(x[0])} and features: {list(data.columns)}")
+    print((f"Len: {len(x[0])} and features: {list(data.columns)}"))
+    # if len(x[0] != 73):
+    #     raise Exception(f"Len: {len(x[0])} and features: {list(data.columns)}")
 
     return x 
 
-#get_file_data("./clean_dataset.csv")
+get_file_data("./clean_dataset.csv")
