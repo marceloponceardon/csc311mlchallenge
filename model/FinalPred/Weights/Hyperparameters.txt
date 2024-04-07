@@ -1,5 +1,6 @@
 Layers: (100,)
+Length of featuers: 73
 Activation: logistic
 Alpha: 0.1
-MLPClassifier train acc: 0.955
-MLPClassifier test acc: 0.8694029850746269
+MLPClassifier train acc: 0.9525
+MLPClassifier test acc: 0.8768656716417911

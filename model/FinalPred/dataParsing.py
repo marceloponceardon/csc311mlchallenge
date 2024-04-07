@@ -89,7 +89,19 @@ def get_data():
 
     # Create category indicators and dummy variables
     new_names = []
-    for col in ["Q1", "Q2", "Q3", "Q4", "Q8", "Q9"] + temp_names:
+
+    col = "Q1"
+    #import pdb; pdb.set_trace()
+    indicators = pd.get_dummies(data[col], prefix=col)
+    for q1_col in ['Q1_-1', 'Q1_1', 'Q1_2', 'Q1_3', 'Q1_4', 'Q1_5']:
+        if q1_col not in indicators.columns:
+            indicators[q1_col] = [False for _ in range(indicators.shape[0])]
+    new_names.extend(indicators.columns)
+    data = pd.concat([data, indicators], axis=1)
+    del data[col]
+
+
+    for col in ["Q2", "Q3", "Q4"] + temp_names:
         indicators = pd.get_dummies(data[col], prefix=col)
         new_names.extend(indicators.columns)
         data = pd.concat([data, indicators], axis=1)
@@ -104,7 +116,7 @@ def get_data():
 
 
     # Preparing the features and labels
-    data = data[new_names + ["Q7", "Label"]]
+    data = data[new_names + ["Q7", "Q8", "Q9", "Label"]]
     data = data.sample(frac=1, random_state=42)
 
     #print(list(data.columns))
@@ -150,7 +162,18 @@ def get_file_data(f_name):
 
     # Create category indicators and dummy variables
     new_names = []
-    for col in ["Q1", "Q2", "Q3", "Q4", "Q8", "Q9"] + temp_names:
+    
+    col = "Q1"
+    #import pdb; pdb.set_trace()
+    indicators = pd.get_dummies(data[col], prefix=col)
+    for q1_col in ['Q1_-1', 'Q1_1', 'Q1_2', 'Q1_3', 'Q1_4', 'Q1_5']:
+        if q1_col not in indicators.columns:
+            indicators[q1_col] = [False for _ in range(indicators.shape[0])]
+    new_names.extend(indicators.columns)
+    data = pd.concat([data, indicators], axis=1)
+    del data[col]
+
+    for col in ["Q2", "Q3", "Q4" ] + temp_names:
         #raise Exception(f"data[{col}] = {list(data[col])}")
         indicators = pd.get_dummies(data[col], prefix=col)
         new_names.extend(indicators.columns)
@@ -167,12 +190,16 @@ def get_file_data(f_name):
 
 
     # Preparing the features and labels
-    data = data[new_names + ["Q7"]]
+    data = data[new_names + ["Q7", "Q8", "Q9"]]
     data = data.sample(frac=1, random_state=42)
     
-    
+    column_ordering = None
+
+
     x = data.values
-    #raise Exception(f"Len: {len(x[0])} and features: {list(data.columns)}")
+    
+    if len(x[0] != 73):
+        raise Exception(f"Len: {len(x[0])} and features: {list(data.columns)}")
 
     return x 
 

@@ -141,8 +141,9 @@ def get_model():
     lyr = (300, 300, 300)
     with open("./Weights/Hyperparameters.txt", "r") as f:
         lyr = eval(f.readline().strip().split(": ")[1])
+        featuer_num = eval(f.readline().strip().split(": ")[1])
     
-    m = MLPModel(num_features = 138, num_hidden = lyr, num_classes = 4)
+    m = MLPModel(num_features = featuer_num, num_hidden = lyr, num_classes = 4)
     return m
 
 
@@ -182,7 +183,7 @@ def predict_all(filename):
 
     return predictions
 
-print(predict_all("./clean_dataset.csv"))
+#print(predict_all("./clean_dataset.csv"))
 #x_train, y_train, x_test, y_test = get_data()
 
 #print(predict(x_train[0]))
