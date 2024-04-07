@@ -121,5 +121,59 @@ def get_data():
 
     return x_train, y_train, x_test, y_test
 
-#x_train, y_train, x_test, y_test = get_data()
+def get_file_data(f_name):
 
+    data = pd.read_csv(f_name)
+
+    # Apply preprocessing to numeric fields
+    data['Q7'] = data['Q7'].apply(to_numeric).fillna(0)
+    data['Q8'] = data['Q8'].apply(to_numeric).fillna(0)
+    data['Q9'] = data['Q9'].apply(to_numeric).fillna(0)
+
+    # Convert Q1 to its first number
+    data['Q1'] = data['Q1'].apply(get_number)
+    data['Q2'] = data['Q2'].apply(get_number)
+    data['Q3'] = data['Q3'].apply(get_number)
+    data['Q4'] = data['Q4'].apply(get_number)
+
+    # Process Q6 to create area rank categories
+    data['Q6'] = data['Q6'].apply(get_number_list_clean)
+
+    temp_names = []
+    for i in range(1, 7):
+        col_name = f"rank_{i}"
+        temp_names.append(col_name)
+        data[col_name] = data["Q6"].apply(lambda l: find_area_at_rank(l, i))
+    del data["Q6"]
+
+
+
+    # Create category indicators and dummy variables
+    new_names = []
+    for col in ["Q1", "Q2", "Q3", "Q4", "Q8", "Q9"] + temp_names:
+        #raise Exception(f"data[{col}] = {list(data[col])}")
+        indicators = pd.get_dummies(data[col], prefix=col)
+        new_names.extend(indicators.columns)
+        data = pd.concat([data, indicators], axis=1)
+        del data[col]
+    
+
+    # Create multi-category indicators
+    for cat in ["Partner", "Friends", "Siblings", "Co-worker"]:
+        cat_name = f"Q5_{cat}"
+        new_names.append(cat_name)
+        data[cat_name] = data["Q5"].apply(lambda s: cat_in_s(s, cat))
+    del data["Q5"]
+
+
+    # Preparing the features and labels
+    data = data[new_names + ["Q7"]]
+    data = data.sample(frac=1, random_state=42)
+    
+    
+    x = data.values
+    #raise Exception(f"Len: {len(x[0])} and features: {list(data.columns)}")
+
+    return x 
+
+#get_file_data("./clean_dataset.csv")
