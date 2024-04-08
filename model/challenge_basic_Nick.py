@@ -19,7 +19,7 @@ x_train, y_train, x_test, y_test = get_data()
 lyr = (100,)
 act = "logistic"
 alpha = 0.1
-clf = MLPClassifier(max_iter=10000, hidden_layer_sizes=lyr, activation=act, verbose=True, alpha=alpha )
+clf = MLPClassifier(max_iter=100, hidden_layer_sizes=lyr, activation=act, verbose=True, alpha=alpha )
 
 # Train and test
 clf.fit(x_train, y_train)
@@ -27,8 +27,10 @@ train_acc = clf.score(x_train, y_train)
 test_acc = clf.score(x_test, y_test)
 
 # All weights
+#import pdb; pdb.set_trace()
 coef = clf.coefs_
 biases = clf.intercepts_
+
 
 # Delete all files in ./FinalPred/Weights
 for f in glob.glob('./FinalPred/Weights/*'):

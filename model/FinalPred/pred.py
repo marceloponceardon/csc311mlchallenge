@@ -16,10 +16,12 @@ class MLPModel(object):
         self.num_layers = len(num_hidden) + 1
         self.activation = activation
 
-        # Array of all the weight matrices for each layer
+        # Arrays of all the weights and biases matrices for each layer
         self.layer_matrices = []
+        self.layer_biases = []
 
-        # Add First Layer
+        # WEIGHTS ------ 
+        # Add First Layer 
         self.layer_matrices.append(np.zeros((self.layer_format[0], self.num_features)))
 
         # Add deep layers
@@ -28,8 +30,6 @@ class MLPModel(object):
 
         # Last hidden layer to classes layer
         self.layer_matrices.append(np.zeros((self.num_classes, self.layer_format[-1])))
-
-
 
         # Read weights from files and set it into matrices
         # Dont even try to dechiper what I wrote here
@@ -54,7 +54,35 @@ class MLPModel(object):
                             line = line[:-1].strip()
                         nums = [float(n.strip()) for n in line.split(" ") if n]
                         col_weights.extend(nums)
-                
+
+        # WEIGHTS ------
+
+        # Biases -----
+        # First biase layer
+        #import pdb; pdb.set_trace()
+        self.layer_biases.append((self.layer_format[0], 1))
+
+        # Add deep layers
+        for i in range(self.num_layers - 2):
+            self.layer_matrices.append((self.layer_format[i+1], 1))
+
+        self.layer_biases.append((self.num_classes, 1))
+
+
+        #import pdb; pdb.set_trace()
+        for i in range(self.num_layers):
+            biases_vector = self.layer_biases[i]
+            with open(f"./Weights/Layer{i}biases.txt", "r") as f:
+                b = f.readlines()
+                assert len(b) == 1 # All the biases were written on one line
+                biase_arr = b[0].strip()
+                biases_arr = eval(biase_arr)
+                assert len(biases_arr) == biases_vector[0]
+
+                self.layer_biases[i] = np.array(biases_arr).reshape(-1, 1)
+
+        
+        # Biases -----                 
 
 
     def sig_activation(self, z):
@@ -95,14 +123,15 @@ class MLPModel(object):
         assert len(self.layer_matrices) >= 2
 
         # First Layer
-        value = act(self.layer_matrices[0] @ X)
+        #import pdb; pdb.set_trace()
+        value = act((self.layer_matrices[0] @ X) + self.layer_biases[0])
 
         # Deep Layers
         for i in range(self.num_layers - 2):
-            value = act(self.layer_matrices[i+1] @ value)
+            value = act((self.layer_matrices[i+1] @ value) + self.layer_biases[i+1])
         
         # Last Layer
-        value = act(self.layer_matrices[-1] @ value)
+        value = act((self.layer_matrices[-1] @ value) + self.layer_biases[-1])
 
         return value
 
@@ -188,6 +217,6 @@ def predict_all(filename):
 
 #print(predict(x_train[0]))
 
-# m = get_model()
-# do_some_tests(m)
+m = get_model()
+do_some_tests(m)
 

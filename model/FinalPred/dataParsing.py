@@ -194,10 +194,10 @@ def get_file_data(f_name):
 
 
     x = data.values
-    print((f"Len: {len(x[0])} and features: {list(data.columns)}"))
+   #print((f"Len: {len(x[0])} and features: {list(data.columns)}"))
     # if len(x[0] != 73):
     #     raise Exception(f"Len: {len(x[0])} and features: {list(data.columns)}")
 
     return x 
 
-get_file_data("./clean_dataset.csv")
+#get_file_data("./clean_dataset.csv")
