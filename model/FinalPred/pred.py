@@ -63,13 +63,15 @@ class MLPModel(object):
         self.layer_biases.append((self.layer_format[0], 1))
 
         # Add deep layers
+       # import pdb; pdb.set_trace()
         for i in range(self.num_layers - 2):
-            self.layer_matrices.append((self.layer_format[i+1], 1))
+            self.layer_biases.append((self.layer_format[i+1], 1))
 
         self.layer_biases.append((self.num_classes, 1))
 
 
         #import pdb; pdb.set_trace()
+
         for i in range(self.num_layers):
             biases_vector = self.layer_biases[i]
             with open(f"./Weights/Layer{i}biases.txt", "r") as f:
@@ -124,14 +126,14 @@ class MLPModel(object):
 
         # First Layer
         #import pdb; pdb.set_trace()
-        value = act((self.layer_matrices[0] @ X) + self.layer_biases[0])
+        value = act((self.layer_matrices[0] @ X))
 
         # Deep Layers
         for i in range(self.num_layers - 2):
-            value = act((self.layer_matrices[i+1] @ value) + self.layer_biases[i+1])
+            value = act((self.layer_matrices[i+1] @ value) )
         
         # Last Layer
-        value = act((self.layer_matrices[-1] @ value) + self.layer_biases[-1])
+        value = act((self.layer_matrices[-1] @ value) )
 
         return value
 

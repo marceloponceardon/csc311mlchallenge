@@ -16,10 +16,10 @@ x_train, y_train, x_test, y_test = get_data()
 # -----------------------------------------------------------------------
 
 # Hyper parameters
-lyr = (100,)
+lyr = (300,)
 act = "logistic"
-alpha = 0.1
-clf = MLPClassifier(max_iter=100, hidden_layer_sizes=lyr, activation=act, verbose=True, alpha=alpha )
+alpha = 0.01
+clf = MLPClassifier(max_iter=70, hidden_layer_sizes=lyr, activation=act, verbose=True, alpha=alpha )
 
 # Train and test
 clf.fit(x_train, y_train)
