@@ -28,6 +28,7 @@ test_acc = clf.score(x_test, y_test)
 
 # All weights
 coef = clf.coefs_
+biases = clf.intercepts_
 
 # Delete all files in ./FinalPred/Weights
 for f in glob.glob('./FinalPred/Weights/*'):
@@ -37,6 +38,10 @@ for i, layer in enumerate(coef):
         for j, node_weights in enumerate(layer):
             f.write(f"Node {j}: \n")
             f.write(str(node_weights) +"\n")
+
+for i, bias_layer in enumerate(biases):
+    with open(f"./FinalPred/Weights/Layer{i}biases.txt", "w+") as f:
+        f.write(str(bias_layer.tolist()) + "\n")
 
 
 # ----- Testing single inputs
@@ -56,7 +61,7 @@ with open(f"./FinalPred/Weights/Hyperparameters.txt", "w+") as f:
     f.write(f"Alpha: {alpha}\n")
     f.write(f"{type(clf).__name__} train acc: {train_acc}\n")
     f.write(f"{type(clf).__name__} test acc: {test_acc}\n")
-    
+
 
 # Print output
 print("Layers: ", lyr)
